@@ -1,0 +1,468 @@
+/**
+ * Overriding default style
+ */
+
+/* ─── In-app menu: hidden by default, revealed only while Alt is held ─── */
+
+/* Kill the menu bar height globally so titlebar.css offsets all collapse to 0 */
+html, :root, body, ytmusic-app, ytmusic-app-layout {
+  --menu-bar-height: 0px !important;
+  --titlebar-background-color: transparent !important;
+}
+
+/* Completely hide the title bar by default - no space, no stripe */
+#ytmd-title-bar-main-panel {
+  display: none !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* While Alt is held: restore height + display the bar */
+body.alt-menu-visible {
+  --menu-bar-height: 32px !important;
+}
+
+body.alt-menu-visible #ytmd-title-bar-main-panel {
+  display: flex !important;
+  height: var(--menu-bar-height, 32px) !important;
+  opacity: 1 !important;
+  pointer-events: all !important;
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+/* Allow window dragging */
+ytmusic-nav-bar {
+  position: relative;
+}
+
+ytmusic-nav-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+ytmusic-nav-bar>.left-content>*,
+ytmusic-nav-bar>.center-content>*,
+ytmusic-nav-bar>.right-content>* {
+  -webkit-app-region: no-drag;
+}
+
+iron-icon,
+ytmusic-pivot-bar-item-renderer,
+.tab-title,
+a {
+  -webkit-app-region: no-drag;
+}
+
+/* custom style for navbar */
+ytmusic-app-layout {
+  --ytmusic-nav-bar-height: 60px;
+}
+
+/* Override inline height on nav-bar-background */
+#nav-bar-background {
+  height: 60px !important;
+}
+
+ytmusic-nav-bar {
+  height: 60px !important;
+  min-height: 60px !important;
+}
+
+/* Prevent nav bar from shifting when the navigation drawer opens.
+   YTMusic expands the left-content based on guide width — lock it to fixed size. */
+ytmusic-nav-bar > .left-content {
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  max-width: 200px !important;
+  transition: none !important;
+}
+
+ytmusic-nav-bar > .center-content {
+  flex: 1 1 auto !important;
+  transition: none !important;
+}
+
+ytmusic-nav-bar > .right-content {
+  flex: 0 0 auto !important;
+  transition: none !important;
+}
+
+/* Disable Image Selection */
+img {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Hide cast button which doesn't work */
+ytmusic-cast-button {
+  display: none !important;
+}
+
+/* Hide hamburger menu button */
+#guide-button {
+  display: none !important;
+}
+
+/* Hide the entire guide/sidebar */
+ytmusic-guide-renderer {
+  display: none !important;
+}
+
+/* Style for library icon in navbar */
+ytmusic-nav-bar > .left-content > yt-icon[icon="yt-icons:bookmark"] {
+  fill: white !important;
+  color: white !important;
+}
+
+ytmusic-nav-bar > .left-content > yt-icon[icon="yt-icons:bookmark"] svg {
+  fill: white !important;
+  color: white !important;
+}
+
+ytmusic-nav-bar > .left-content > yt-icon[icon="yt-icons:bookmark"] svg path {
+  fill: white !important;
+  color: white !important;
+}
+
+/* Remove useless inaccessible button on top-right corner of the video player */
+.ytp-chrome-top-buttons {
+  display: none !important;
+}
+
+/* Make the logo un-draggable */
+ytmusic-nav-bar>div.left-content>a,
+ytmusic-nav-bar>div.left-content>a>picture>img {
+  -webkit-user-drag: none;
+}
+
+/* yt-music bugs */
+tp-yt-paper-item.ytmusic-guide-entry-renderer::before {
+  border-radius: 8px !important;
+}
+
+/* fix video player align */
+#av-id {
+  padding-bottom: 0;
+}
+
+#av-id~#player.ytmusic-player-page:not([player-ui-state='FULLSCREEN']) {
+  margin-top: auto !important;
+  margin-bottom: auto !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-height: 100% !important;
+  max-width: 100% !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* macos traffic lights fix */
+:where([data-os*='Macintosh']) ytmusic-app-layout#layout ytmusic-nav-bar {
+  padding-top: var(--ytmusic-nav-bar-offset, 0);
+}
+
+:where([data-os*='Macintosh']) ytmusic-app-layout#layout {
+  --ytmusic-nav-bar-offset: 24px;
+  --ytmusic-nav-bar-height: calc(90px + var(--ytmusic-nav-bar-offset, 0));
+}
+
+tp-yt-iron-dropdown,
+tp-yt-paper-dialog {
+  app-region: no-drag;
+}
+
+/* Windows titlebar controls fix */
+ytmusic-nav-bar #right-content {
+  padding-right: 140px !important;
+  box-sizing: border-box !important;
+}
+
+ytmusic-nav-bar[is-search-page] #right-content {
+  position: absolute !important;
+  right: 0px !important;
+}
+
+ytmusic-nav-bar[is-search-page] ytmusic-search-box {
+  max-width: 480px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  transform: translateX(-64px) !important;
+}
+
+@media (display-mode: fullscreen) {
+  ytmusic-nav-bar #right-content {
+    padding-right: 0 !important;
+  }
+}
+
+/* Hide the persistent mini guide icon rail - always hidden */
+ytmusic-guide-renderer#mini-guide-renderer {
+  display: none !important;
+  width: 0 !important;
+}
+
+/* Navigation drawer: hidden when closed, fixed overlay when opened */
+ytmusic-navigation-drawer:not([opened]) {
+  display: none !important;
+  width: 0 !important;
+  pointer-events: none !important;
+}
+
+ytmusic-navigation-drawer[opened] {
+  display: block !important;
+  position: fixed !important;
+  top: 60px !important;
+  left: 0 !important;
+  z-index: 2147483647 !important;
+  height: calc(100vh - 60px) !important;
+  width: auto !important;
+  overflow-y: auto !important;
+  box-shadow: 4px 0 32px rgba(0, 0, 0, 0.6) !important;
+  /* Ensure content inside the drawer is visible */
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Force root font-size to 10px so YouTube Music's rem-based styling renders at correct scale */
+html {
+  font-size: 10px !important;
+}
+
+/* Collapse spacing of hidden mini guide sidebar - never let it push content */
+html,
+body,
+:root,
+ytmusic-app,
+ytmusic-app-layout,
+ytmusic-browse-response,
+ytmusic-guide-renderer,
+#content-wrapper {
+  --ytmusic-guide-width: 0px !important;
+  --ytmusic-mini-guide-width: 0px !important;
+  --ytmusic-navigation-drawer-width: 0px !important;
+}
+
+/* Ensure the content wrapper takes full width */
+ytmusic-browse-response[has-sidebar] #content-wrapper.ytmusic-browse-response,
+#content-wrapper.ytmusic-browse-response,
+#content-wrapper {
+  margin-left: 0 !important;
+}
+
+/* Reduce side padding so content reaches closer to window edges */
+html,
+:root,
+ytmusic-app,
+ytmusic-app-layout {
+  --ytmusic-page-padding: 12px !important;
+  /* Override the hardcoded max-width formula that limits content to 1478px */
+  --ytmusic-content-width: calc(100vw - 58px) !important;
+}
+
+ytmusic-section-list-renderer,
+ytmusic-grid-renderer,
+ytmusic-shelf-renderer {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Reduce the main content area side padding */
+#browse-page.ytmusic-browse-response,
+#single-column-browse-results,
+ytmusic-browse-response>#contents {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+/* Tighten section list renderer padding */
+ytmusic-section-list-renderer>#contents {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Fix immersive header background image to cover full width */
+.image.ytmusic-immersive-header-renderer {
+  margin-left: 0 !important;
+}
+
+/* Hide year, views, and separators from song info in player bar */
+ytmusic-player-bar .byline .yt-formatted-string:last-child,
+ytmusic-player-bar .subtitle .yt-formatted-string:last-child,
+ytmusic-player-bar .byline .yt-formatted-string:nth-last-child(2),
+ytmusic-player-bar .subtitle .yt-formatted-string:nth-last-child(2),
+ytmusic-player-bar .byline .yt-formatted-string:nth-last-child(3),
+ytmusic-player-bar .subtitle .yt-formatted-string:nth-last-child(3),
+ytmusic-player-bar .byline .yt-formatted-string:nth-last-child(4),
+ytmusic-player-bar .subtitle .yt-formatted-string:nth-last-child(4) {
+  display: none !important;
+}
+
+/* Hide time info from player bar */
+ytmusic-player-bar .time-info {
+  display: none !important;
+}
+
+/* Custom player bar layout: song info left, controls center, volume right */
+ytmusic-player-bar#top-player-bar {
+  display: none !important;
+}
+
+/* Reduce player page padding */
+ytmusic-player-page:not([is-mweb-modernization-enabled]) .content.ytmusic-player-page {
+  padding: 24px !important;
+}
+
+ytmusic-player-bar {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+ytmusic-player-bar > .middle-controls {
+  margin-right: auto !important;
+  padding-left: 20px !important;
+}
+
+ytmusic-player-bar > #left-controls {
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+ytmusic-player-bar > #right-controls {
+  margin-left: auto !important;
+  padding-right: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Hide expand button and regular controls, show only expanding menu items */
+ytmusic-player-bar .expand-button,
+ytmusic-player-bar .right-controls-buttons {
+  display: none !important;
+}
+
+/* Show expanding menu items inline */
+ytmusic-player-bar ytmusic-player-expanding-menu {
+  display: flex !important;
+  opacity: 1 !important;
+  position: absolute !important;
+  right: 48px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  max-height: none !important;
+  max-width: none !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+
+
+/* Hide all scrollbars */
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+ytmusic-app-layout::-webkit-scrollbar,
+#content::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+* {
+  scrollbar-width: none !important;
+  /* Firefox */
+}
+
+/* Force scroll to top on page navigation */
+ytmusic-app-layout,
+#content,
+.tab-content {
+  scroll-behavior: auto !important;
+}
+
+/* Prevent flickering by hiding elements until loaded */
+ytmusic-nav-bar,
+ytmusic-player-bar,
+#custom-title-bar-element {
+  opacity: 1 !important;
+  transition: opacity 0.1s ease-in !important;
+}
+
+/* Hide profile menu until ready to prevent flickering */
+ytmusic-avatar-renderer,
+ytmusic-menu-popup-renderer {
+  transition: opacity 0.15s ease-in !important;
+}
+
+/* Prevent profile menu from opening on startup */
+ytmusic-menu-popup-renderer[style*="opacity: 1"],
+ytmusic-menu-popup-renderer[aria-hidden="false"] {
+  display: none !important;
+}
+
+/* Only show profile menu when explicitly opened */
+ytmusic-menu-popup-renderer.open {
+  display: block !important;
+}
+
+/* Center search bar horizontally only in main nav bar using flexbox - removed to prevent home screen issues */
+
+/* Hide mini-guide */
+#mini-guide {
+  display: none !important;
+}
+
+/* Truncate long titles responsively */
+ytmusic-player-bar .title,
+ytmusic-player-bar .subtitle,
+ytmusic-player-bar yt-formatted-string.title,
+ytmusic-player-bar yt-formatted-string.subtitle {
+  max-width: min(200px, 25vw) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Truncate titles in browse pages and lists */
+ytmusic-responsive-list-item-renderer .title,
+ytmusic-grid-renderer .title,
+ytmusic-shelf-renderer .title,
+ytmusic-card-shelf-renderer .title {
+  max-width: min(300px, 30vw) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* For wider windows, allow more space */
+@media (min-width: 1200px) {
+  ytmusic-player-bar .title,
+  ytmusic-player-bar .subtitle,
+  ytmusic-player-bar yt-formatted-string.title,
+  ytmusic-player-bar yt-formatted-string.subtitle {
+    max-width: min(500px, 35vw) !important;
+  }
+
+  ytmusic-responsive-list-item-renderer .title,
+  ytmusic-grid-renderer .title,
+  ytmusic-shelf-renderer .title,
+  ytmusic-card-shelf-renderer .title {
+    max-width: min(400px, 25vw) !important;
+  }
+}
