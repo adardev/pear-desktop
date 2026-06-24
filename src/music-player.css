@@ -5,9 +5,10 @@
 /* ─── In-app menu: hidden by default, revealed only while Alt is held ─── */
 
 /* Kill the menu bar height globally so titlebar.css offsets all collapse to 0 */
-html, :root, body, ytmusic-app, ytmusic-app-layout {
+html, :root, body, ytmusic-app, ytmusic-app-layout, ytmusic-player-page {
   --menu-bar-height: 0px !important;
   --titlebar-background-color: transparent !important;
+  --ytmusic-player-page-content-gap: 24px !important;
 }
 
 /* Completely hide the title bar by default - no space, no stripe */
@@ -93,6 +94,7 @@ ytmusic-nav-bar > .center-content {
 ytmusic-nav-bar > .right-content {
   flex: 0 0 auto !important;
   transition: none !important;
+  margin-left: auto !important;
 }
 
 /* Disable Image Selection */
@@ -103,6 +105,11 @@ img {
 
 /* Hide cast button which doesn't work */
 ytmusic-cast-button {
+  display: none !important;
+}
+
+/* Hide history button */
+.history-icon-button.ytmusic-nav-bar {
   display: none !important;
 }
 
@@ -164,6 +171,15 @@ tp-yt-paper-item.ytmusic-guide-entry-renderer::before {
   overflow: hidden !important;
 }
 
+@media (min-width: 1000px) {
+  #av-id~#player.ytmusic-player-page:not([player-ui-state='FULLSCREEN']) {
+    width: 90% !important;
+    height: 90% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
 /* macos traffic lights fix */
 :where([data-os*='Macintosh']) ytmusic-app-layout#layout ytmusic-nav-bar {
   padding-top: var(--ytmusic-nav-bar-offset, 0);
@@ -203,6 +219,16 @@ ytmusic-nav-bar[is-search-page] ytmusic-search-box {
   ytmusic-nav-bar #right-content {
     padding-right: 0 !important;
   }
+}
+
+ytmusic-app-layout:has(ytmusic-player[player-ui-state='FULLSCREEN']) ytmusic-player-bar,
+ytmusic-app-layout:has(ytmusic-player-page[player-ui-state='FULLSCREEN']) ytmusic-player-bar {
+  opacity: 0 !important;
+  transform: translateY(100%) !important;
+  pointer-events: none !important;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease !important;
 }
 
 /* Hide the persistent mini guide icon rail - always hidden */
@@ -318,8 +344,8 @@ ytmusic-player-bar#top-player-bar {
 }
 
 /* Reduce player page padding */
-ytmusic-player-page:not([is-mweb-modernization-enabled]) .content.ytmusic-player-page {
-  padding: 24px !important;
+ytmusic-player-page .content.ytmusic-player-page {
+  padding: 24px 0 24px 24px !important;
 }
 
 ytmusic-player-bar {
@@ -421,7 +447,31 @@ ytmusic-menu-popup-renderer.open {
   display: block !important;
 }
 
-/* Center search bar horizontally only in main nav bar using flexbox - removed to prevent home screen issues */
+/* Allow side panel to overflow the player page container */
+ytmusic-player-page,
+ytmusic-player-page .content.ytmusic-player-page {
+  overflow: visible !important;
+}
+
+/* Reduce padding for the side panel and stretch it to the bottom */
+ytmusic-player-page #side-panel.side-panel,
+#side-panel.ytmusic-player-page {
+  padding: 0 24px 24px 0 !important;
+  height: calc(100% + var(--ytmusic-nav-bar-height)) !important;
+  align-self: flex-start !important;
+}
+
+/* Center search bar horizontally only in main nav bar using flexbox */
+ytmusic-nav-bar[is-bauhaus-sidenav-enabled] .center-content.ytmusic-nav-bar {
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 100% !important;
+  max-width: 480px !important;
+  justify-content: center !important;
+  padding-left: 0 !important;
+  margin: 0 !important;
+}
 
 /* Hide mini-guide */
 #mini-guide {
@@ -465,4 +515,30 @@ ytmusic-card-shelf-renderer .title {
   ytmusic-card-shelf-renderer .title {
     max-width: min(400px, 25vw) !important;
   }
+}
+
+/* Hide lyrics picker */
+.lyrics-picker,
+div:has(> .lyrics-picker) {
+  display: none !important;
+}
+
+/* Make video fill the container to prevent letterboxing on wide videos */
+#song-video.ytmusic-player,
+ytmusic-player #song-video,
+ytmusic-player #movie_player,
+ytmusic-player .html5-video-container,
+ytmusic-player video {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+ytmusic-player .html5-video-container {
+  inset: 0 !important;
+}
+
+ytmusic-player video {
+  top: 0 !important;
+  left: 0 !important;
+  object-fit: cover !important;
 }

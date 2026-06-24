@@ -9,7 +9,8 @@ import is from 'electron-is';
 import * as config from './config';
 
 window.addEventListener('contextmenu', (e) => {
-  e.stopPropagation();
+  e.stopImmediatePropagation();
+  e.preventDefault();
 }, true);
 
 

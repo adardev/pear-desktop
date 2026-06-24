@@ -578,27 +578,19 @@ export const mainMenuTemplate = async (
               },
             },
             { type: 'separator' },
-            is.macOS()
-              ? {
-                  label: t(
-                    'main.menu.options.submenu.advanced-options.submenu.toggle-dev-tools',
-                  ),
-                  // Cannot use "toggleDevTools" role in macOS
-                  click() {
-                    const { webContents } = win;
-                    if (webContents.isDevToolsOpened()) {
-                      webContents.closeDevTools();
-                    } else {
-                      webContents.openDevTools();
-                    }
-                  },
+            {
+              label: t(
+                'main.menu.options.submenu.advanced-options.submenu.toggle-dev-tools',
+              ),
+              click() {
+                const { webContents } = win;
+                if (webContents.isDevToolsOpened()) {
+                  webContents.closeDevTools();
+                } else {
+                  webContents.openDevTools();
                 }
-              : {
-                  label: t(
-                    'main.menu.options.submenu.advanced-options.submenu.toggle-dev-tools',
-                  ),
-                  role: 'toggleDevTools',
-                },
+              },
+            },
             {
               label: t(
                 'main.menu.options.submenu.advanced-options.submenu.edit-config-json',

@@ -12,8 +12,6 @@ import {
   dialog,
   ipcMain,
   protocol,
-  Menu,
-  clipboard,
   type BrowserWindowConstructorOptions,
 } from 'electron';
 import {
@@ -173,6 +171,11 @@ if (process.platform === 'win32') {
   icon = 'assets/generated/icons/mac/icon.icns';
 }
 
+const fixedWindowSize = {
+  width: 990,
+  height: 800,
+};
+
 function onClosed() {
   // Dereference the window
   // For multiple Windows store them in an array
@@ -316,12 +319,27 @@ function initTheme(win: BrowserWindow) {
     //   console.debug(LoggerPrefix, t('main.console.did-finish-load.dev-tools'));
     //   // win.webContents.openDevTools();
     // }
+
+    // Remove inline padding from side panel to allow CSS override
+    win.webContents.executeJavaScript(`
+      const removePadding = () => {
+        const playerPage = document.querySelector('ytmusic-player-page');
+        const sidePanel = playerPage?.shadowRoot?.getElementById('side-panel') || document.getElementById('side-panel');
+        if (sidePanel) {
+          sidePanel.style.padding = '';
+        }
+      };
+      
+      // Run immediately and every 100ms to ensure it sticks
+      removePadding();
+      setInterval(removePadding, 100);
+    `);
   });
 }
 
 async function createMainWindow() {
-  const windowSize = config.get('window-size');
-  const windowMaximized = config.get('window-maximized');
+  const windowSize = fixedWindowSize;
+  const windowMaximized = false;
   const windowPosition: Electron.Point = config.get('window-position');
   const useInlineMenu = await config.plugins.isEnabled('in-app-menu');
 
@@ -356,9 +374,13 @@ async function createMainWindow() {
     height: windowSize.height,
     minWidth: 325,
     minHeight: 425,
+    resizable: true,
+    maximizable: true,
+    fullscreenable: true,
     backgroundColor: '#000',
     show: false,
     webPreferences: {
+      devTools: true,
       contextIsolation: true,
       preload: path.join(__dirname, '..', 'preload', 'preload.cjs'),
       ...(isTesting()
@@ -375,7 +397,9 @@ async function createMainWindow() {
   const win = new BrowserWindow(electronWindowSettings);
 
   win.on('maximize', () => win.webContents.send('window-maximize'));
-  win.on('unmaximize', () => win.webContents.send('window-unmaximize'));
+  win.on('unmaximize', () => {
+    win.webContents.send('window-unmaximize');
+  });
 
   await initHook(win);
   initTheme(win);
@@ -446,22 +470,12 @@ async function createMainWindow() {
   let winWasMaximized: boolean;
 
   win.on('resize', () => {
-    const [width, height] = win.getSize();
     const isMaximized = win.isMaximized();
 
     if (winWasMaximized !== isMaximized) {
       winWasMaximized = isMaximized;
       config.set('window-maximized', isMaximized);
     }
-
-    if (isMaximized) {
-      return;
-    }
-
-    lateSave('window-size', {
-      width,
-      height,
-    });
   });
 
   const savedTimeouts: Record<string, NodeJS.Timeout | undefined> = {};
@@ -593,67 +607,7 @@ app.on('browser-window-created', (_event, win) => {
   setupSongInfo(win);
   setupAppControls(win);
 
-  win.webContents.on('context-menu', (_, props) => {
-    const template: Electron.MenuItemConstructorOptions[] = [
-      {
-        label: t('main.menu.navigation.submenu.go-back') || 'Back',
-        enabled: win.webContents.navigationHistory.canGoBack(),
-        click: () => win.webContents.navigationHistory.goBack(),
-      },
-      {
-        label: t('main.menu.navigation.submenu.go-forward') || 'Forward',
-        enabled: win.webContents.navigationHistory.canGoForward(),
-        click: () => win.webContents.navigationHistory.goForward(),
-      },
-      {
-        label: t('main.menu.view.submenu.reload') || 'Reload',
-        click: () => win.webContents.reload(),
-      },
-      { type: 'separator' },
-    ];
 
-    if (props.isEditable) {
-      template.push({ role: 'undo' });
-      template.push({ role: 'redo' });
-      template.push({ type: 'separator' });
-    }
-
-    if (props.selectionText || props.isEditable) {
-      if (props.editFlags.canCut) {
-        template.push({ role: 'cut' });
-      }
-      if (props.editFlags.canCopy) {
-        template.push({ role: 'copy' });
-      }
-    }
-
-    if (props.isEditable && props.editFlags.canPaste) {
-      template.push({ role: 'paste' });
-    }
-
-    if (props.linkURL) {
-      template.push({
-        label: t('Copy Link Address') || 'Copy Link Address',
-        click: () => {
-          clipboard.writeText(props.linkURL);
-        },
-      });
-    }
-
-    if (template.length > 0 && template[template.length - 1].type !== 'separator') {
-      template.push({ type: 'separator' });
-    }
-
-    template.push({
-      label: t('Inspect') || 'Inspect',
-      click: () => {
-        win.webContents.inspectElement(props.x, props.y);
-      },
-    });
-
-    const contextMenu = Menu.buildFromTemplate(template);
-    contextMenu.popup({ window: win });
-  });
 
   win.webContents.on('console-message', (_event, level, message, line, sourceId) => {
     console.log(`[RENDERER CONSOLE] [Level ${level}] ${message} (${sourceId}:${line})`);
@@ -766,7 +720,7 @@ app.whenReady().then(async () => {
   // Register appID on windows
   if (is.windows()) {
     const appID =
-      'com.github.th-ch.\u0079\u006f\u0075\u0074\u0075\u0062\u0065\u002d\u006d\u0075\u0073\u0069\u0063';
+      'com.adardev.\u0079\u006f\u0075\u0074\u0075\u0062\u0065\u002d\u006d\u0075\u0073\u0069\u0063';
     app.setAppUserModelId(appID);
     const appLocation = process.execPath;
     const appData = app.getPath('appData');
